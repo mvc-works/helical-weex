@@ -34,6 +34,7 @@ helicalExpandTree = (tree) ->
 div = (props, children...) -> helicalCreateElememt 'div', props, children...
 text = (props, children...) -> helicalCreateElememt 'text', props, children...
 input = (props, children...) -> helicalCreateElememt 'input', props, children...
+scroller = (props, children...) -> helicalCreateElememt 'scroller', props, children...
 
 # utils
 
@@ -60,64 +61,84 @@ store =
 styleBody =
   alignItems: 'center'
   justifyContent: 'center'
+  paddingTop: 16
+  paddingLeft: 24
+  paddingRight: 24
 
 styleContainer =
-  backgroundColor: '#eeeeee'
-  width: 750
+  backgroundColor: '#fafafa'
+  width: 702
   flex: 1
 
 styleHeader =
-  backgroundColor: '#eeeeee'
   height: 80
   flexDirection: 'row'
+  marginBottom: 16
 
 styleInput =
   color: '#333333'
-  backgroundColor: '#dddddd'
-  height: 60
-  lineHeight: 60
+  backgroundColor: '#eee'
+  height: 80
+  lineHeight: 80
   paddingLeft: 16
   paddingRight: 16
   flex: 1
+  marginRight: 16
 
 styleButton =
   width: 160
-  height: 60
+  height: 80
+  lineHeight: 80
   backgroundColor: '#aaaaff'
   color: 'white'
   textAlign: 'center'
   fontSize: 32
-  paddingTop: 8
 
 styleContent =
-  paddingTop: 8
-  paddingBottom: 8
-  backgroundColor: '#ddd'
+  flexDirection: 'column'
+  alignItems: 'stretch'
+  maxHeight: 800
+  overflow: 'auto'
+  flex: 0
+
+styleRaw =
+  color: '#aaa'
+  fontSize: 24
 
 styleTask =
-  height: 60
-  width: 750
-  backgroundColor: '#afa'
+  height: 80
+  width: 702
+  backgroundColor: '#fff'
   flexDirection: 'row'
+  marginBottom: 16
 
 styleDone =
-  width: 48
-  height: 48
-  backgroundColor: '#8ff'
+  width: 80
+  height: 80
+  backgroundColor: '#6f6'
+  flexShrink: 0
 
 styleTaskText =
   flex: 1
-  height: 48
+  height: 80
+  lineHeight: 80
+  marginLeft: 16
+  marginRight: 16
 
 styleRemove =
-  width: 48
-  height: 48
-  backgroundColor: '#fcc'
+  width: 80
+  height: 80
+  backgroundColor: '#f88'
+
+styleInfo =
+  flexDirection: 'row'
+  justifyContent: 'flex-end'
 
 # frequent DOM operations
 
 getRaw = ->
-  store.tasks.map((task) -> task.text).join(' | ')
+  count = store.tasks.length
+  "#{count} tasks"
 
 modifyRaw = ->
   console.log 'Raw data', getRaw(), store.tasks
@@ -129,6 +150,7 @@ onDraft = (event) ->
   store.draft = event.target.attr.value
 
 onAdd = (event) ->
+  _startTime = Date.now()
   newTask = id: getId(), done: 'false', text: store.draft
   store.draft = ''
   store.tasks.unshift newTask
@@ -137,11 +159,23 @@ onAdd = (event) ->
   domRefs.input.setAttr 'value', ''
   newElement = helicalExpandTree (taskTree newTask)
   console.log '\nnewElement:', newElement
-  domRefs.content.appendChild newElement
+  if domRefs.content.children.length is 0
+    domRefs.content.appendChild newElement
+  else
+    anchor = domRefs.content.children[0]
+    domRefs.content.insertBefore newElement, anchor
   modifyRaw()
+  console.log 'Elapsed time:', (Date.now() - _startTime)
 
-onToggle = (event) ->
-  console.log 'onToggle', event
+onToggle = (taskId) -> (event) ->
+  doneStatus = undefined
+  store.tasks.forEach (task) ->
+    if task.id is taskId
+      task.done = not task.done
+      doneStatus = task.done
+  # DOM operations
+  console.log 'Done status:', doneStatus
+  event.target.setStyle 'backgroundColor', (if doneStatus then '#fdd' else '#6f6')
 
 onRemove = (taskId) -> (event) ->
   store.tasks = store.tasks.filter (task) -> task.id isnt taskId
@@ -167,8 +201,8 @@ onUpdate = (taskId) -> (event) ->
 taskTree = (task) ->
   div style: styleTask,
     div
-      style: styleDone
-      event: {click: onToggle}
+      style: Object.assign {}, styleDone
+      event: {click: onToggle task.id}
     input
       attr:
         value: task.text
@@ -192,13 +226,15 @@ mainTree = ->
           style: styleButton
           attr: {value: 'Add task'}
           event: {click: onAdd}
-      text
-        ref: 'raw'
-        attr: {value: getRaw()}
-        style: styleContent
-      div
+      scroller
         ref: 'content'
         style: styleContent
+      div
+        style: styleInfo
+        text
+          ref: 'raw'
+          attr: {value: getRaw()}
+          style: styleRaw
 
 # mounting document
 
