@@ -1,0 +1,28 @@
+{
+  "name": "helical",
+  "version": "0.1.0",
+  "description": "Tiny framework for Weex inspired by Backbone and React",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mvc-works/helical.git"
+  },
+  "keywords": [
+    "Weex",
+    "MVC"
+  ],
+  "author": "jiyinyiyong",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mvc-works/helical/issues"
+  },
+  "homepage": "https://github.com/mvc-works/helical#readme",
+  "devDependencies": {
+    "coffee-loader": "^0.7.3",
+    "coffee-script": "^1.12.4",
+    "webpack": "^2.3.1"
+  }
+}

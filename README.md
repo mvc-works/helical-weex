@@ -9,13 +9,14 @@ Helical is a demo in Weex
 Compile with CoffeeScript on the fly:
 
 ```bash
-coffee --no-header -o lib -bwc src/helical.coffee
+yarn
+webpack -w
 ```
 
 Start an HTTP server:
 
 ```bash
-http-server -c-1 lib/
+http-server -c-1 build/
 ```
 
 Get QR code for Weex http://www.qr-code-generator.com/

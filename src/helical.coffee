@@ -1,9 +1,7 @@
-`// { "framework": "Vanilla" }
-`
 
 # global sharing
 
-doc = weex.document
+document = weex.document
 
 # framework
 
@@ -15,7 +13,7 @@ helicalCreateElememt = (name, props, children...) ->
 helicalExpandTree = (tree) ->
   # console.log '\n\nExpanding:', JSON.stringify(tree)
   [name, props, children] = tree
-  element = doc.createElement name,
+  element = document.createElement name,
     style: props.style
     attr: props.attr
   if props.event
@@ -44,8 +42,6 @@ getId = ->
   refId
 
 # initial variables
-
-modal = weex.requireModule 'modal'
 
 deviceWidth = weex.config.env.deviceWidth
 deviceHeight = weex.config.env.deviceHeight
@@ -238,4 +234,4 @@ mainTree = ->
 
 # mounting document
 
-doc.documentElement.appendChild (helicalExpandTree mainTree())
+document.documentElement.appendChild (helicalExpandTree mainTree())
